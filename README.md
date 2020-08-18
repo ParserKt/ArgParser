@@ -121,7 +121,7 @@ This one is the best I've got, it tooks me at least 5-hrs making that...
 - _How's the performance of this lib comparing to others?_
 
 I don't care, but `SwitchParser` will only traverse `args` once every time you `run`,
- and declarative code is _always no faster_ than imperative one (a lot of `Map<String,` is allocated in `ArgParser4`)
+ and declarative code is _always no faster than_ imperative one (a lot of `Map<String,Arg<*>>` is allocated in `ArgParser4`)
 
 - _`ArgParserBy` for unusual/subcommand arg definitions requires dirty code_
 
@@ -129,7 +129,7 @@ I'v tried my best... forgive me
 
 - _Your English grammar is poor_
 
-...Sorry for that, and please open an issue if you found my grammar mistake.
+...Sorry for that, and please open an issue if you found my grammar mistakes.
 
 ## Extension APIs
 
@@ -163,13 +163,18 @@ abstract class ArgParserHandlers {
 
 ## Source Reading
 
-Ordering:
+Ordering & focal point:
 
-- [SwitchParser](src/commonMain/kotlin/org/parserkt/argp/SwitchParser.kt) a basic `Array<String>` iterator state machine with `onItem` and `onPrefix` and pretty error messages
-- [ArgParser](src/commonMain/kotlin/org/parserkt/argp/ArgParser.kt) functional wrapper to `SwitchParser` using `Map`s to make DSL-style available
-- [Helpers](src/commonMain/kotlin/org/parserkt/argp/Helpers.kt) Utils & multiplatform CLI and extension for `Arg<String>`/`Arg<T>` building
-- [ArgParserBy](src/commonMain/kotlin/org/parserkt/argp/ArgParserBy.kt) By delegates and `backRun`/`addSub` wrapper to dynamic typed `ArgParser`
-- [ParserTricks](src/commonMain/kotlin/org/parserkt/argp/ParserTricks.kt) Tricks using this framework (contributions are welcome)
+- [SwitchParser](src/commonMain/kotlin/org/parserkt/argp/SwitchParser.kt) a basic `Array<String>` iterator state machine with `onItem` and `onPrefix` and pretty error messages. __focus__: `run`, `arg`, `ParseError`/`ParseLoc`, `Companion.extractArg`
+- [ArgParser](src/commonMain/kotlin/org/parserkt/argp/ArgParser.kt) `ArgParser4`~`ArgParsrer1`(subclass) functional wrapper to `SwitchParser` using `Map`s to make DSL-style available. 
+    __focus__: `ParseResult` (tup,named,flags,items), `ArgParser4.<init>`(checks), `commandAliases`,
+    `dynamicNameMap`/`flagMap`(non-typed "prefix name" map), `inner class Driver: SwitchParser`, `argToOMs`+`nameMap`,
+    `getOrPutOM`/`addResult`(dynamic storage), `itemArgZ`(an iter); `onItem`, `onPrefix`, `read`, `dynamicInterpret`; `onArg` (alias&subcmd), `run`, `assignDefaultOrFail`; and `backRun`/`toString`/`ArgParserAsSubDelegate`  
+- [Helpers](src/commonMain/kotlin/org/parserkt/argp/Helpers.kt) Utils & multiplatform CLI and extension for `Arg<String>`/`Arg<T>` building. __focus__: `Env` a multiplatform(MP) CLI API set(envvar/prompt/write), `arg`/`argInt`, (JVM)`argFile`, 
+    `OneOrMore`+`NamedMap`, `TextCaps`, `associateByAll`(used in arg alias `Arg.names`), `joinToBreakLines` (format --help summary line)
+- [ArgParserBy](src/commonMain/kotlin/org/parserkt/argp/ArgParserBy.kt) By delegates and `backRun`/`addSub` wrapper to dynamic typed `ArgParser`. __focus__: `reversed` (for `[...] a b` desctruct), `By`(used as namespace) `.res`, 
+    `By.Flag`/`By.ParsedArg<T,R>`(`.wrap`), `By.Param.multiply`, `ArgParser4.reversed`/`Arg<Str>.addNopConvert`(in ParserTricks) 
+- [ParserTricks](src/commonMain/kotlin/org/parserkt/argp/ParserTricks.kt) Tricks using this framework (contributions are welcome). __focus__: `addHelpSubcommand`, `Arg<T>.env`+`Arg<Str>.getEnv` (!overload for JVM), `Arg<T>.wrapXXX`
 
 ## Thanks
 

@@ -89,7 +89,7 @@ internal fun <T> Iterable<T>.associateByAll(key_selector: (T) -> Iterable<String
   for (item in this) for (k in key_selector(item)) map[k] = item
   return map
 }
-internal inline fun <K, V> MutableMap<K, V>.mapKey(key: K, transform: (V) -> V) {
+inline fun <K, V> MutableMap<K, V>.mapKey(key: K, transform: (V) -> V) {
   this[key]?.let(transform)?.let { this[key] = it }
 }
 internal fun String.split() = split(' ')
