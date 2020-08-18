@@ -4,10 +4,10 @@
     <facet type="kotlin-language" name="Kotlin">
       <configuration version="3" platform="Native " allPlatforms="Native []" useProjectSettings="false" isTestModule="true" externalProjectId="argparser">
         <sourceSets>
-          <sourceSet>org.parserkt.argp.argparser.commonMain</sourceSet>
           <sourceSet>org.parserkt.argp.argparser.macosX64Main</sourceSet>
           <sourceSet>org.parserkt.argp.argparser.commonTest</sourceSet>
           <sourceSet>org.parserkt.argp.argparser.nativeMain</sourceSet>
+          <sourceSet>org.parserkt.argp.argparser.commonMain</sourceSet>
         </sourceSets>
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <compilerSettings />

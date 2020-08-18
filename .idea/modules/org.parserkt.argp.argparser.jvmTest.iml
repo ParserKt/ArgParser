@@ -5,8 +5,8 @@
       <configuration version="3" platform="JVM 1.8" allPlatforms="JVM [1.8]" useProjectSettings="false" isTestModule="true" externalProjectId="argparser">
         <sourceSets>
           <sourceSet>org.parserkt.argp.argparser.jvmMain</sourceSet>
-          <sourceSet>org.parserkt.argp.argparser.commonTest</sourceSet>
           <sourceSet>org.parserkt.argp.argparser.commonMain</sourceSet>
+          <sourceSet>org.parserkt.argp.argparser.commonTest</sourceSet>
         </sourceSets>
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <compilerSettings>
