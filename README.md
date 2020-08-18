@@ -6,7 +6,7 @@
 
 ArgParser is a simplified argument parser / multiplatform CLI for Kotlin.
 
-with only about 500 LoC implementation, ArgParser has:
+With only about 500 LoC implementation, ArgParser has:
 
 - Parsing for params, flags, items(positional args) and [subcommands](src/commonMain/kotlin/org/parserkt/argp/ParserTricks.kt)
 - Type safe and convince data model (`Tuple4`/`OneOrMore` and `NamedMap`, you can ignore them and just use `ArgParserBy`)
@@ -27,7 +27,7 @@ And the one using `ArgParserBy` wrapper:
 ```kotlin
 class ReadMapUsingBy(ap: ArgParserBy) {
   val name by ap+arg("name", "...", "map_name", "anonymous") { require(it.isNotBlank()) ; it }
-  val map by (ap+arg("map p", "...", "k v", convert = multiParam { it[0] to it[1] })).multiply { it.toMap() }
+  val map by (ap+arg("map m", "...", "k v", convert = multiParam { it[0] to it[1] })).multiply { it.toMap() }
   val mode by ap+arg("mode", "...", "", "none").checkOptions("none", "mutable", "linked")
   val showVer by ap+arg("v", "print version") { println("v1.0") ; SwitchParser.stop() }//should not be accessed
   val isShowVer/*run later?*/ by ap.flag("v", "print version", "vh") // when 'h' in res.flags, item count/ordering checking are suppressed.
@@ -72,13 +72,14 @@ object PipOld: ArgParser1<Unit>(noArg, helpArg) {
 + Supports variable number of items and named destruct (both `[src...] [dst]` and `[dst] [src...]` are supported)
 + Extension funs for idiom: `checkOptions(*strings)`, `options("a" to 1)`, `options(SomeEnum)`, `getEnv()`, `multiParam {list->}`, `defineFlags("enable-oo" to "O")`
 + Supports __repeatable args, multiply params, each can with a converter__
-+ __Sub-commands__ and command alias (like `pip install`, `git commit -m` -> `git cm`)
++ __Sub-commands and command alias__ (like `pip install`, `git commit -m` -> `git cm`)
 + Extensible using `override`, features like prompt when missing, mutually exclusive args, sequential prefixes(`ffmpeg`), @-file expansion, did-you-mean suggestion can be implmented easily
 + Generates well formatted line-wrapped help message (can be grouped), only with Kotlin's named arguments in `toString`(opened for override)
 + __Supports `backRun` unparsing__, so it's also fascinating to build a CLI program binding with this lib
 + Supports 3 different programming paradigm: procedural `SwitchParser`, OOP&FP `ArgParser`, reflect `ArgParserBy`
 + KISS(keep it simple, stupid) principle, modular programming, "Simplicity is the ultimate sophistication".
 + Readable code with reading order guide, <^v>comments and a little line breaks ;)
++ TBD: add shell completion gen(not compile time, req. Arg objects) in a separate module
 
 ## Not Features 😟
 
@@ -110,25 +111,25 @@ So what's the reason for adding them in `org.parserkt.argp`, instead of letting 
 This repository is licensed under MIT, neither GNU nor UNIX :)
 
 ...and it's boring to separate "long option" and "short option"(they are both "prefixed" option), if you wants to build a [Minimist Parser](https://github.com/substack/minimist)
-that must distinguish between them, override `checkPrefixForName` and save `val currentPrefix`
- (a partially implemented one can be found [here](src/commonTest/kotlin/TheArgParserVersions.kt)).
+that must distinguish between them, override `checkPrefixForName` and save `var currentPrefix`
+ (a partially implemented one can be found [here](src/commonTest/kotlin/TheArgParserVersions.kt#L64)).
 
 - _The animated banner is low-quality/have slow frame rate_
 
-This one is the best I've got, it tooks me least 5-hrs making that...
+This one is the best I've got, it tooks me at least 5-hrs making that...
 
 - _How's the performance of this lib comparing to others?_
 
 I don't care, but `SwitchParser` will only traverse `args` once every time you `run`,
  and declarative code is _always no faster_ than imperative one (a lot of `Map<String,` is allocated in `ArgParser4`)
 
-- _`ArgParserBy` for unusual arg definitions requires dirty code_
+- _`ArgParserBy` for unusual/subcommand arg definitions requires dirty code_
 
 I'v tried my best... forgive me
 
 - _Your English grammar is poor_
 
-...Sorry for that
+...Sorry for that, and please open an issue if you found my grammar mistake.
 
 ## Extension APIs
 

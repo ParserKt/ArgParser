@@ -1,5 +1,7 @@
 package org.parserkt.argp
 
+import kotlin.reflect.KProperty
+
 /** [ArgParser4] class constructed with val by delegate support, using [flag]/[plus]/[item] ordered call side-effects(not direct list) */
 class ArgParserBy(private val prog: String) {
   private val flags: MutableList<Arg<*>> = mutableListOf()
@@ -18,24 +20,31 @@ class ArgParserBy(private val prog: String) {
   /** Exposed val-by delegate classes container */
   class By(private val self: ArgParserBy) { // symbol [M] means this "myself", [KP] reflect is never used
     private inline val res get() = self.res
-    inner class Flag(private val p: Arg<*>) { init { self.flags.add(p) }
-      operator fun <M> getValue(_m:M, _p:KP): Boolean = p.secondName in res.flags
-      operator fun <M> setValue(_m:M, _p:KP, v: Boolean) { res.flags = res.flags.replace(p.secondName, "") }
+    inner class Flag(p: Arg<*>) { init { self.flags.add(p) }
+      private val flag = p.secondName
+      operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean = flag in res.flags
+      operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) { res.flags = if (value) res.flags+flag else res.flags.replace(flag, "") }
     }
-    abstract inner class ParsedArg<T>(private val p: Arg<T>, private val isItem: Boolean = false) {
+    abstract inner class ParsedArg<T, R>(private val p: Arg<T>, private val isItem: Boolean = false) {
       init { (if (isItem) self.items else self.params).add(p) }
       protected var sto get() = res.named!!.map.getValue(p.firstName)
         set(v) { res.named!!.getMutable()!![p.firstName] = v }
       private fun remove() = (if (isItem) self.items else self.params).remove(p)
       fun <R> wrap(transform: (Arg<T>) -> R): R { remove() ; return transform(p) }
+
+      operator fun getValue(thisRef: Any?, property: KProperty<*>): R = value
+      operator fun setValue(thisRef: Any?, property: KProperty<*>, value: R) { this.value = value }
+      abstract var value: R
     }
-    open inner class SingleArg<T>(p: Arg<T>, isItem: Boolean): ParsedArg<T>(p, isItem) {
-      operator fun <M> getValue(_m:M, _p:KP): T = @Suppress("unchecked_cast") (sto.get() as T)
-      operator fun <M> setValue(_m:M, _p:KP, v: T) { sto = OneOrMore<Any>(v) }
+    open inner class SingleArg<T>(p: Arg<T>, isItem: Boolean): ParsedArg<T, T>(p, isItem) {
+      override var value: T
+        get() = @Suppress("unchecked_cast") (sto.get() as T)
+        set(v) { sto = OneOrMore<Any>(v) }
     }
-    inner class RepeatArg<T>(p: Arg<T>, isItem: Boolean): ParsedArg<T>(p, isItem) {
-      operator fun <M> getValue(_m:M, _p:KP): List<T> = @Suppress("unchecked_cast") (sto.toList() as List<T>)
-      operator fun <M> setValue(_m:M, _p:KP, v: List<T>) { sto = OneOrMore.listAny(v) }
+    inner class RepeatArg<T>(p: Arg<T>, isItem: Boolean): ParsedArg<T, List<T>>(p, isItem) {
+      override var value: List<T>
+        get() = @Suppress("unchecked_cast") (sto.toList() as List<T>)
+        set(v) { sto = OneOrMore.listAny(v) }
     }
 
     inner class Param<T>(p: Arg<T>): SingleArg<T>(p, isItem = false) {
@@ -44,8 +53,10 @@ class ArgParserBy(private val prog: String) {
       fun multiply(): RepeatArg<T> = wrap { RepeatArg(it.toRepeatable(), isItem = false) } //<^ convert ops
       private fun <T> Arg<T>.toRepeatable() = Arg(name, help, param, null, true, convert)
     }
-    inner class ArgConvert<T, R>(p: Arg<T>, private val transform: (OneOrMore<T>) -> R): ParsedArg<T>(p) {
-      operator fun <M> getValue(_m:M, _p: KP): R = @Suppress("unchecked_cast") (sto as OneOrMore<T>).let(transform)
+    inner class ArgConvert<T, R>(p: Arg<T>, private val transform: (OneOrMore<T>) -> R): ParsedArg<T, R>(p) {
+      override var value: R
+        get() = @Suppress("unchecked_cast") (sto as OneOrMore<T>).let(transform)
+        set(_) {}
     }
   }
 

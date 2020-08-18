@@ -9,7 +9,7 @@ object ReadMap: ArgParser3<String, Pair<String, String>, String>(
 
 class ReadMapUsingBy(ap: ArgParserBy) {
   val name by ap+arg("name", "...", "map_name", "anonymous") { require(it.isNotBlank()) ; it }
-  val map by (ap+arg("map p", "...", "k v", convert = multiParam { it[0] to it[1] })).multiply { it.toMap() }
+  val map by (ap+arg("map m", "...", "k v", convert = multiParam { it[0] to it[1] })).multiply { it.toMap() }
   val mode by ap+arg("mode", "...", "", "none").checkOptions("none", "mutable", "linked")
   val showVer by ap+arg("v", "print version") { println("v1.0") ; SwitchParser.stop() }//should not be accessed
   val isShowVer/*run later?*/ by ap.flag("v", "print version", "vh") // when 'h' in res.flags, item count checking are suppressed.

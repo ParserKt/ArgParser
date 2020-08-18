@@ -1,9 +1,5 @@
 package org.parserkt.argp
 
-import kotlin.reflect.KProperty
-
-internal typealias KP = KProperty<*>
-
 typealias ArgArray = Array<out String>
 typealias Convert<R> = ((String) -> R)?
 
